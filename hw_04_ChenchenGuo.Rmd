@@ -1,30 +1,69 @@
 ---
 title: "hw-04"
-author: "guochenchen"
+author: "Guochenchen"
 date: "October 7th, 2018"
 output: github_document
+always_allow_html: yes
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+
+#Homework 04: Tidy data and joins
+
+## Data Reshaping Prompts(And relationship to aggregation)
+
+```{r}
+# Firstly load all libraries
+suppressPackageStartupMessages(library(gapminder))
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(knitr))
+suppressPackageStartupMessages(library(kableExtra))
+```
+### Make a tibble with one row per year and columns for life expectancy for two or more countries
+```{r}
+data1 <- gapminder %>% 
+  filter(country %in% c('China', 'Japan', 'Canada')) %>% 
+  select(year, country, lifeExp)
+
+knitr::kable(head(data1, 20)) %>% 
+  kable_styling(bootstrap_options = "bordered", latex_options = "basic", full_width = F)
+  
+
+# To further explore this table
+data2 <- spread(data1, key = "country", value = "lifeExp") %>% 
+  rename(lifeexp_Canada = Canada, lifeexp_China = China, lifeexp_Japan = Japan)
+
+knitr::kable(data2) %>% 
+  kable_styling(bootstrap_options = "bordered", latex_options = "basic", full_width = F)
+
+#To scatter plot this data further indicate the comparison between lifeexp of these three countries
+ggplot(data1, aes(year, lifeExp)) +
+  geom_point(aes(color = country))+
+  scale_x_continuous(limits = c(1952, 2007), breaks = seq(1952, 2007, 5))+
+  xlab("Year")+ ylab("Life expectancy") + ggtitle("Life expectancy of Canada, China and Japan")
+  
 ```
 
-## R Markdown
+###Compute life expectancy for all possible combinations of content and year. Reshape that to have one row per year and one variable for each continent.
+```{r}
+# Here to compute the maximum lifeExpectancy for all continents each year
+data3 <- gapminder %>% 
+  group_by(continent, year) %>% 
+  summarise(MaxLifeExp = max(lifeExp))
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+data4 <- spread(data3, key = "continent", value = "MaxLifeExp")
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+knitr::kable(data4) %>% 
+  kable_styling(bootstrap_options = "bordered", latex_options = "basic", full_width = F)
 
-```{r cars}
-summary(cars)
+# alter the x, y of table 
+data5 <- spread(data3, key = "year", value = "MaxLifeExp")
+
+knitr::kable(data5) %>% 
+  kable_styling(bootstrap_options = "bordered", latex_options = "basic", full_width = F)
 ```
+###Reshape the table to have one row per year or per year * continent combination
+```{r}
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
 ```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+###
