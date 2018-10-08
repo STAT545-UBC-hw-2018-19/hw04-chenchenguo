@@ -10,7 +10,7 @@ The Link of Homework 4: \[[Repository](https://github.com/STAT545-UBC-students/h
      * Join  prompts: white_check_mark:
      
   * Activities of Data reshaping prompts
-     * Activity 1| : white_check_mark:
+     * Activity 1: : white_check_mark:
      * Activity 2| : white_check_mark:
      * Activity 3| : white_check_mark:
      * Activity 4| : white_check_mark:
