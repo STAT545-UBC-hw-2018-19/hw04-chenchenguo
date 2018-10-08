@@ -485,11 +485,10 @@ data3 <- gapminder %>%
 
 data4 <- spread(data3, key = "continent", value = "MaxLifeExp")
 
-knitr::kable(head(data4, 20)) %>% 
-  kable_styling(bootstrap_options = "bordered", latex_options = "basic", full_width = F)
+knitr::kable(head(data4, 20)) 
 ```
 
-<table class="table table-bordered" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<table>
 <thead>
 <tr>
 <th style="text-align:right;">
@@ -759,11 +758,10 @@ Oceania
 # alter the x, y of table 
 data5 <- spread(data3, key = "year", value = "MaxLifeExp")
 
-knitr::kable(head(data5, 20)) %>% 
-  kable_styling(bootstrap_options = "bordered", latex_options = "basic", full_width = F)
+knitr::kable(head(data5, 20)) 
 ```
 
-<table class="table table-bordered" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<table>
 <thead>
 <tr>
 <th style="text-align:left;">
