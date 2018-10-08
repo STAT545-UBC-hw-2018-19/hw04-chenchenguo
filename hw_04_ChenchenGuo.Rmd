@@ -18,8 +18,11 @@ suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library(ggplot2))
 suppressPackageStartupMessages(library(knitr))
 suppressPackageStartupMessages(library(kableExtra))
+suppressPackageStartupMessages(library(reshape2))
+suppressPackageStartupMessages(library(wbstats))
+
 ```
-### Make a tibble with one row per year and columns for life expectancy for two or more countries
+### 1. Make a tibble with one row per year and columns for life expectancy for two or more countries
 ```{r}
 data1 <- gapminder %>% 
   filter(country %in% c('China', 'Japan', 'Canada')) %>% 
@@ -44,7 +47,7 @@ ggplot(data1, aes(year, lifeExp)) +
   
 ```
 
-###Compute life expectancy for all possible combinations of content and year. Reshape that to have one row per year and one variable for each continent.
+### 2. Compute life expectancy for all possible combinations of content and year. Reshape that to have one row per year and one variable for each continent.
 ```{r}
 # Here to compute the maximum lifeExpectancy for all continents each year
 data3 <- gapminder %>% 
@@ -61,9 +64,120 @@ data5 <- spread(data3, key = "year", value = "MaxLifeExp")
 
 knitr::kable(data5) %>% 
   kable_styling(bootstrap_options = "bordered", latex_options = "basic", full_width = F)
+
+# And the plot of data 4
+ggplot(data = data3, aes(x=year, y=MaxLifeExp, group = continent, colour = continent))+
+  geom_line(size = 1)+
+  scale_x_continuous(limits = c(1952, 2007), breaks = seq(1952, 2007, 5))+
+  xlab("Year")+ ylab("Max Life Expectancy") + ggtitle("Maximum Life expectancy tendency of each continent from 1952 to 2007")
+
+# another way to show this, use bar chart to separately indicate the maximum lifeexpectancy of each continent
+ggplot(data = data3, aes(x=continent, y=MaxLifeExp, group=continent))+
+  facet_wrap( ~year)+
+  geom_col(aes(fill=MaxLifeExp), size = 5)+
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))+
+  ggtitle("Maximum Life expectancy of each continent from 1952 to 2007")
+  
 ```
-###Reshape the table to have one row per year or per year * continent combination
+### 3. Reshape the table to have one row per year or per year * continent combination
 ```{r}
+data6 <- gapminder %>% 
+  group_by(year, continent) %>% 
+  filter(min_rank(lifeExp)<2 | min_rank(desc(lifeExp))<2) %>% 
+  select(year, continent, country, lifeExp)
+knitr::kable(head(data6, 20)) %>% 
+  kable_styling(bootstrap_options = "bordered", latex_options = "basic", full_width = F)
+
+# for per year*continent combination
+data7 <- data6 %>% 
+  group_by(year, continent) %>% 
+  arrange(lifeExp) %>% 
+  mutate(MinlifeExp_country = first(country), 
+         MinlifeExp_value = min(lifeExp),
+         MaxlifeExp_country = last(country),
+         MaxlifeExp_value = max(lifeExp)) %>% 
+  arrange(year) %>% 
+  unite("Year_Cont", year, continent) %>% 
+  select(Year_Cont, MinlifeExp_country, MinlifeExp_value, MaxlifeExp_country, MaxlifeExp_value)
+# Form to table
+knitr::kable(data7) %>% 
+  kable_styling(bootstrap_options = "bordered", latex_options = "basic", full_width = F)
+```
+### 4. Data manipulation sampler
+```{r}
+# filter out gdp for china, japan and canada for each year
+data8 <- gapminder %>% 
+  filter(country %in% c("China", "Japan", "Canada")) %>% 
+  select(year, country, gdpPercap)
+# only show 15 of whole data to keep markdown file compact
+knitr::kable(head(data8, 15)) %>% 
+  kable_styling(bootstrap_options = "bordered", latex_options = "basic", full_width = F)
+
+# calculate the total gdp of three countries for each year
+data9 <- data8 %>% 
+  group_by(year) %>% 
+  summarize(Total_country=n(),
+            Total_gdp=sum(gdpPercap))
+knitr::kable(data9) %>% 
+  kable_styling(bootstrap_options = "bordered", latex_options = "basic", full_width = F)
+
+# the gapminder dataset is not a perfect example to show dcast and with function here.
+C <- with(data9, table(year, Total_country))
+kable(C)
+```
+## Join Prompts(join, merge, look up)
+### Load another data package: country_Capitals
+```{r}
+# The second data frame used complementary to gapminder is country_capitals.
+
+coun_cap <- read.csv("https://github.com/icyrockcom/country-capitals/raw/master/data/country-list.csv")
+ls(coun_cap)
+nrow(coun_cap)
+nrow(gapminder)
+# Show the country contained in country_capitals but not in gapminder
+setdiff(coun_cap$country, gapminder$country)
+# show countries contained in gapminder but not in country_capitals
+setdiff(gapminder$country, coun_cap$country)
 
 ```
-###
+### Activity 1
+
+```{r}
+head(coun_cap)
+
+# use left join to join these two data
+coun_cap$type <- NULL
+# To delete the type column of package country capital which will not be used in this join function.
+# And firstly left join gapminder and capitals by country column
+join1 <- gapminder %>% 
+  filter(year == "2007") %>% 
+  left_join(coun_cap, by = "country")
+knitr::kable(join1) %>% 
+   kable_styling(bootstrap_options = "bordered", latex_options = "basic", full_width = F)
+
+#Then right join, the difference are right join will contain all countries in countrycapitals, hence lots ofcountries has no values of continent, year, lifeExp and etc.
+join2 <- gapminder %>% 
+  filter(year == "2007") %>% 
+  right_join(coun_cap, by = "country")
+knitr::kable(join2) %>% 
+   kable_styling(bootstrap_options = "bordered", latex_options = "basic", full_width = F)
+
+# Then use inner join, this time only intersect datas will be shown
+join3 <- gapminder %>% 
+  filter(year == "2007") %>% 
+  inner_join(coun_cap, by = "country")
+knitr::kable(join3) %>% 
+   kable_styling(bootstrap_options = "bordered", latex_options = "basic", full_width = F)
+# And semi join, here only countries of gapminder that in country capitals will be displayed. this means some counties that gapminder has but not in country capitals will be ignored
+join4 <- gapminder %>% 
+  filter(year == "2007") %>% 
+  semi_join(coun_cap, by = "country")
+knitr::kable(join4) %>% 
+   kable_styling(bootstrap_options = "bordered", latex_options = "basic", full_width = F)
+
+#Anti-join: This will display those countries in gapminder but not in country capitals
+join5 <- gapminder %>% 
+  filter(year == "2007") %>% 
+  anti_join(coun_cap, by = "country")
+knitr::kable(join5) %>% 
+   kable_styling(bootstrap_options = "bordered", latex_options = "basic", full_width = F)
