@@ -268,8 +268,9 @@ China
 </tr>
 </tbody>
 </table>
+To further explore this table
+
 ``` r
-# To further explore this table
 data2 <- spread(data1, key = "country", value = "lifeExp") %>% 
   rename(lifeexp_Canada = Canada, lifeexp_China = China, lifeexp_Japan = Japan)
 
@@ -465,29 +466,32 @@ lifeexp\_Japan
 </tr>
 </tbody>
 </table>
+To scatter plot this data further indicate the comparison between lifeexp of these three countries
+
 ``` r
-#To scatter plot this data further indicate the comparison between lifeexp of these three countries
 ggplot(data1, aes(year, lifeExp)) +
   geom_point(aes(color = country))+
   scale_x_continuous(limits = c(1952, 2007), breaks = seq(1952, 2007, 5))+
   xlab("Year")+ ylab("Life expectancy") + ggtitle("Life expectancy of Canada, China and Japan")
 ```
 
-![](hw_04_ChenchenGuo_files/figure-markdown_github/unnamed-chunk-2-1.png)
+![](hw_04_ChenchenGuo_files/figure-markdown_github/unnamed-chunk-4-1.png)
 
 ### 2. Compute life expectancy for all possible combinations of content and year. Reshape that to have one row per year and one variable for each continent.
 
+Here to compute the maximum lifeExpectancy for all continents each year
+
 ``` r
-# Here to compute the maximum lifeExpectancy for all continents each year
 data3 <- gapminder %>% 
   group_by(continent, year) %>% 
   summarise(MaxLifeExp = max(lifeExp))
 
 data4 <- spread(data3, key = "continent", value = "MaxLifeExp")
-kable(head(data4, 20)) 
+knitr::kable(data4) %>% 
+  kable_styling(bootstrap_options = "bordered", latex_options = "basic", full_width = F)
 ```
 
-<table>
+<table class="table table-bordered" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
 <th style="text-align:right;">
@@ -753,13 +757,15 @@ Oceania
 </tr>
 </tbody>
 </table>
+alter the x, y of table
+
 ``` r
-# alter the x, y of table 
 data5 <- spread(data3, key = "year", value = "MaxLifeExp")
-kable(head(data5, 20)) 
+knitr::kable(data5) %>% 
+  kable_styling(bootstrap_options = "bordered", latex_options = "basic", full_width = F)
 ```
 
-<table>
+<table class="table table-bordered" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
 <th style="text-align:left;">
@@ -1011,18 +1017,18 @@ Oceania
 </tr>
 </tbody>
 </table>
+And the plot of data 4
+
 ``` r
-# And the plot of data 4
 ggplot(data = data3, aes(x=year, y=MaxLifeExp, group = continent, colour = continent))+
   geom_line(size = 1)+
   scale_x_continuous(limits = c(1952, 2007), breaks = seq(1952, 2007, 5))+
   xlab("Year")+ ylab("Max Life Expectancy") + ggtitle("Maximum Life expectancy tendency of each continent from 1952 to 2007")
 ```
 
-![](hw_04_ChenchenGuo_files/figure-markdown_github/unnamed-chunk-3-1.png)
+![](hw_04_ChenchenGuo_files/figure-markdown_github/unnamed-chunk-7-1.png) another way to show this, use bar chart to separately indicate the maximum lifeexpectancy of each continent
 
 ``` r
-# another way to show this, use bar chart to separately indicate the maximum lifeexpectancy of each continent
 ggplot(data = data3, aes(x=continent, y=MaxLifeExp, group=continent))+
   facet_wrap( ~year)+
   geom_col(aes(fill=MaxLifeExp), size = 5)+
@@ -1030,7 +1036,9 @@ ggplot(data = data3, aes(x=continent, y=MaxLifeExp, group=continent))+
   ggtitle("Maximum Life expectancy of each continent from 1952 to 2007")
 ```
 
-![](hw_04_ChenchenGuo_files/figure-markdown_github/unnamed-chunk-3-2.png) \#\#\# 3. Reshape the table to have one row per year or per year \* continent combination
+![](hw_04_ChenchenGuo_files/figure-markdown_github/unnamed-chunk-8-1.png)
+
+### 3. Reshape the table to have one row per year or per year \* continent combination
 
 ``` r
 data6 <- gapminder %>% 
@@ -1341,8 +1349,9 @@ Australia
 </tr>
 </tbody>
 </table>
+for per year\*continent combination
+
 ``` r
-# for per year*continent combination
 data7 <- data6 %>% 
   group_by(year, continent) %>% 
   arrange(lifeExp) %>% 
@@ -1353,7 +1362,11 @@ data7 <- data6 %>%
   arrange(year) %>% 
   unite("Year_Cont", year, continent) %>% 
   select(Year_Cont, MinlifeExp_country, MinlifeExp_value, MaxlifeExp_country, MaxlifeExp_value)
-# Form to table
+```
+
+Form to table
+
+``` r
 knitr::kable(data7) %>% 
   kable_styling(bootstrap_options = "bordered", latex_options = "basic", full_width = F)
 ```
@@ -3423,12 +3436,17 @@ Japan
 </table>
 ### 4. Data manipulation sampler
 
+filter out gdp for china, japan and canada for each year
+
 ``` r
-# filter out gdp for china, japan and canada for each year
 data8 <- gapminder %>% 
   filter(country %in% c("China", "Japan", "Canada")) %>% 
   select(year, country, gdpPercap)
-# only show 15 of whole data to keep markdown file compact
+```
+
+only show 15 of whole data to keep markdown file compact
+
+``` r
 knitr::kable(head(data8, 15)) %>% 
   kable_styling(bootstrap_options = "bordered", latex_options = "basic", full_width = F)
 ```
@@ -3615,8 +3633,9 @@ China
 </tr>
 </tbody>
 </table>
+calculate the total gdp of three countries for each year
+
 ``` r
-# calculate the total gdp of three countries for each year
 data9 <- data8 %>% 
   group_by(year) %>% 
   summarize(Total_country=n(),
@@ -3774,13 +3793,15 @@ Total\_gdp
 </tr>
 </tbody>
 </table>
+the gapminder dataset is not a perfect example to show dcast and with function here.
+
 ``` r
-# the gapminder dataset is not a perfect example to show dcast and with function here.
 C <- with(data9, table(year, Total_country))
-kable(C)
+knitr::kable(C) %>% 
+  kable_styling(bootstrap_options = "bordered", latex_options = "basic", full_width = F)
 ```
 
-<table>
+<table class="table table-bordered" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
 <th style="text-align:left;">
@@ -3894,9 +3915,9 @@ Join Prompts(join, merge, look up)
 
 ### Load another data package: country\_Capitals
 
-``` r
-# The second data frame used complementary to gapminder is country_capitals.
+The second data frame used complementary to gapminder is country\_capitals.
 
+``` r
 coun_cap <- read.csv("https://github.com/icyrockcom/country-capitals/raw/master/data/country-list.csv")
 ls(coun_cap)
 ```
@@ -3915,8 +3936,9 @@ nrow(gapminder)
 
     ## [1] 1704
 
+Show the country contained in country\_capitals but not in gapminder
+
 ``` r
-# Show the country contained in country_capitals but not in gapminder
 setdiff(coun_cap$country, gapminder$country)
 ```
 
@@ -4039,8 +4061,9 @@ setdiff(coun_cap$country, gapminder$country)
     ## [117] "Western Sahara"                              
     ## [118] "Yemen"
 
+show countries contained in gapminder but not in country\_capitals
+
 ``` r
-# show countries contained in gapminder but not in country_capitals
 setdiff(gapminder$country, coun_cap$country)
 ```
 
@@ -4067,10 +4090,14 @@ head(coun_cap)
     ## 6        American Samoa           Pago Pago countryCapital
 
 ``` r
-# use left join to join these two data
 coun_cap$type <- NULL
-# To delete the type column of package country capital which will not be used in this join function.
-# And firstly left join gapminder and capitals by country column
+```
+
+To delete the type column of package country capital which will not be used in this join function. And firstly left join gapminder and capitals by country column
+
+use left join to join these two data
+
+``` r
 join1 <- gapminder %>% 
   filter(year == "2007") %>% 
   left_join(coun_cap, by = "country")
@@ -7402,8 +7429,9 @@ Harare
 </tr>
 </tbody>
 </table>
+Then right join, the difference are right join will contain all countries in countrycapitals, hence lots ofcountries has no values of continent, year, lifeExp and etc.
+
 ``` r
-#Then right join, the difference are right join will contain all countries in countrycapitals, hence lots ofcountries has no values of continent, year, lifeExp and etc.
 join2 <- gapminder %>% 
   filter(year == "2007") %>% 
   right_join(coun_cap, by = "country")
@@ -13150,8 +13178,9 @@ Harare
 </tr>
 </tbody>
 </table>
+Then use inner join, this time only intersect datas will be shown
+
 ``` r
-# Then use inner join, this time only intersect datas will be shown
 join3 <- gapminder %>% 
   filter(year == "2007") %>% 
   inner_join(coun_cap, by = "country")
@@ -16184,8 +16213,9 @@ Harare
 </tr>
 </tbody>
 </table>
+And semi join, here only countries of gapminder that in country capitals will be displayed. this means some counties that gapminder has but not in country capitals will be ignored
+
 ``` r
-# And semi join, here only countries of gapminder that in country capitals will be displayed. this means some counties that gapminder has but not in country capitals will be ignored
 join4 <- gapminder %>% 
   filter(year == "2007") %>% 
   semi_join(coun_cap, by = "country")
@@ -18805,8 +18835,9 @@ Africa
 </tr>
 </tbody>
 </table>
+Anti-join: This will display those countries in gapminder but not in country capitals
+
 ``` r
-#Anti-join: This will display those countries in gapminder but not in country capitals
 join5 <- gapminder %>% 
   filter(year == "2007") %>% 
   anti_join(coun_cap, by = "country")
