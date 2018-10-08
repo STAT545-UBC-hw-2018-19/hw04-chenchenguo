@@ -484,8 +484,7 @@ data3 <- gapminder %>%
   summarise(MaxLifeExp = max(lifeExp))
 
 data4 <- spread(data3, key = "continent", value = "MaxLifeExp")
-
-knitr::kable(head(data4, 20)) 
+kable(head(data4, 20)) 
 ```
 
 <table>
@@ -757,8 +756,7 @@ Oceania
 ``` r
 # alter the x, y of table 
 data5 <- spread(data3, key = "year", value = "MaxLifeExp")
-
-knitr::kable(head(data5, 20)) 
+kable(head(data5, 20)) 
 ```
 
 <table>
