@@ -10,11 +10,13 @@ The Link of Homework 4: \[[Repository](https://github.com/STAT545-UBC-students/h
      * Join  prompts: white_check_mark:
      
   * Activities of Data reshaping prompts
-     * Activity 1: : white_check_mark:
-     * Activity 2| : white_check_mark:
-     * Activity 3| : white_check_mark:
-     * Activity 4| : white_check_mark:
+     * Activity 1: :white_check_mark:
+     * Activity 2: :white_check_mark:
+     * Activity 3: :white_check_mark:
+     * Activity 4: :white_check_mark:
    
    * Activities of Join prompts
-     * Activity 1| : white_check_mark:
+     * Activity 1: :white_check_mark:
   
+  The dataset used for join functions with gapminder is country_capitals. 
+  Left_join, right_join, inner_join, semi_join and anti_join are used to indicate the differences.
